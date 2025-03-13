@@ -1,0 +1,4 @@
+{
+	"extends": "@peralva/tsconfig",
+	"include": ["src/**/*.ts"]
+}

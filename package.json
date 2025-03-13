@@ -1,0 +1,60 @@
+{
+	"author": "Bruno Peralva <brunoperalva@hotmail.com>",
+	"bugs": {
+		"url": "https://github.com/peralva/npm-template/issues"
+	},
+	"description": "Template",
+	"devDependencies": {
+		"@eslint/js": "^9.22.0",
+		"@peralva/prettier-config": "^1.0.15",
+		"@peralva/tsconfig": "^1.0.5",
+		"@rollup/plugin-typescript": "^12.1.2",
+		"@types/node": "^22.13.10",
+		"eslint": "^9.22.0",
+		"eslint-config-prettier": "^9.1.0",
+		"globals": "^15.15.0",
+		"prettier": "^3.5.3",
+		"rollup": "^4.35.0",
+		"rollup-plugin-dts": "^6.1.1",
+		"tslib": "^2.8.1",
+		"typescript": "^5.7.3",
+		"typescript-eslint": "^8.26.1"
+	},
+	"exports": {
+		".": {
+			"import": "./lib/index.mjs",
+			"require": "./lib/index.js",
+			"types": "./lib/index.d.ts"
+		}
+	},
+	"files": [
+		"lib/index.d.ts",
+		"lib/index.js",
+		"lib/index.mjs"
+	],
+	"homepage": "https://github.com/peralva/npm-template#readme",
+	"keywords": [
+		"npm",
+		"template"
+	],
+	"license": "MIT",
+	"main": "lib/index.js",
+	"module": "lib/index.mjs",
+	"name": "@peralva/template",
+	"prettier": "@peralva/prettier-config",
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/peralva/npm-template.git"
+	},
+	"scripts": {
+		"build": "rollup --config",
+		"build:dev": "tsc --outDir ./dist/ --sourceMap true --watch",
+		"build:test": "tsc --outDir ./dist/",
+		"start": "node --enable-source-maps --inspect --trace-warnings --watch dist",
+		"test": "node --test dist"
+	},
+	"version": "0.0.0"
+}
