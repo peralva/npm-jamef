@@ -4,7 +4,7 @@
 		"url": "https://github.com/peralva/npm-jamef/issues"
 	},
 	"dependencies": {
-		"@peralva/services": "^1.0.0"
+		"@peralva/services": "^1.0.1"
 	},
 	"description": "Jamef",
 	"devDependencies": {
