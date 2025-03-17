@@ -1,4 +1,5 @@
 import {
+	ApiJamefComBrConsultaV1RastreamentoGet,
 	ApiJamefComBrDocumentosV1NotaFiscalPost,
 	services,
 } from '@peralva/services';
@@ -27,29 +28,29 @@ export class Jamef {
 				},
 			} as const;
 
-			let responseService;
+			let response;
 
 			if (this.isProduction) {
-				responseService = await services({
+				response = await services({
 					url: 'https://api.jamef.com.br/auth/v1/login',
 					...options,
 				});
 			} else {
-				responseService = await services({
+				response = await services({
 					url: 'https://api-qa.jamef.com.br/auth/v1/login',
 					...options,
 				});
 			}
 
-			if (responseService.status !== 200) {
+			if (response.status !== 200) {
 				throw new Error(
-					'mensagem' in responseService.body
-						? responseService.body.mensagem
-						: responseService.body.error,
+					'mensagem' in response.body
+						? response.body.mensagem
+						: response.body.error,
 				);
 			}
 
-			this.token = responseService.body.dado[0].accessToken;
+			this.token = response.body.dado[0].accessToken;
 		}
 
 		return `Bearer ${this.token}`;
@@ -79,16 +80,55 @@ export class Jamef {
 			},
 		} as const;
 
+		let response;
+
 		if (this.isProduction) {
-			return await services({
+			response = await services({
 				url: 'https://api.jamef.com.br/documentos/v1/nota-fiscal',
+				...options,
+			});
+		} else {
+			response = await services({
+				url: 'https://api-qa.jamef.com.br/documentos/v1/nota-fiscal',
 				...options,
 			});
 		}
 
-		return await services({
-			url: 'https://api-qa.jamef.com.br/documentos/v1/nota-fiscal',
-			...options,
-		});
+		return response;
+	}
+
+	public async getTracking(
+		query: ApiJamefComBrConsultaV1RastreamentoGet['request']['query'],
+	): Promise<
+		ReturnType<
+			typeof services<{
+				url: 'https://api.jamef.com.br/consulta/v1/rastreamento';
+				method: 'GET';
+				query: typeof query;
+				headers: { Authorization: Awaited<ReturnType<Jamef['login']>> };
+			}>
+		>
+	> {
+		const options = {
+			method: 'GET',
+			query,
+			headers: { Authorization: await this.login() },
+		} as const;
+
+		let response;
+
+		if (this.isProduction) {
+			response = await services({
+				url: 'https://api.jamef.com.br/consulta/v1/rastreamento',
+				...options,
+			});
+		} else {
+			response = await services({
+				url: 'https://api-qa.jamef.com.br/consulta/v1/rastreamento',
+				...options,
+			});
+		}
+
+		return response;
 	}
 }
