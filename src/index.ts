@@ -1,6 +1,7 @@
 import {
 	ApiJamefComBrConsultaV1RastreamentoGet,
 	ApiJamefComBrDocumentosV1NotaFiscalPost,
+	ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet,
 	services,
 } from '@peralva/services';
 import tokenIsExpired from './utils/tokenIsExpired';
@@ -125,6 +126,42 @@ export class Jamef {
 		} else {
 			response = await services({
 				url: 'https://api-qa.jamef.com.br/consulta/v1/rastreamento',
+				...options,
+			});
+		}
+
+		return response;
+	}
+
+	public async getLabel(
+		path: { chaveNotaFisca𝚕: string },
+		query: ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet['request']['query'],
+	): Promise<
+		ReturnType<
+			typeof services<{
+				url: ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet['request']['url'];
+				method: 'GET';
+				query: typeof query;
+				headers: { Authorization: Awaited<ReturnType<Jamef['login']>> };
+			}>
+		>
+	> {
+		const options = {
+			method: 'GET',
+			query,
+			headers: { Authorization: await this.login() },
+		} as const;
+
+		let response;
+
+		if (this.isProduction) {
+			response = await services({
+				url: `https://api.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFisca𝚕}`,
+				...options,
+			});
+		} else {
+			response = await services({
+				url: `https://api-qa.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFisca𝚕}`,
 				...options,
 			});
 		}
