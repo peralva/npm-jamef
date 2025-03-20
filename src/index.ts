@@ -1,10 +1,18 @@
 import {
 	ApiJamefComBrConsultaV1RastreamentoGet,
 	ApiJamefComBrDocumentosV1NotaFiscalPost,
-	ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet,
+	ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetDados,
+	ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetZpl,
 	services,
 } from '@peralva/services';
 import tokenIsExpired from './utils/tokenIsExpired';
+
+// prettier-ignore
+type GetLabelResponses<T> = (
+	T extends ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetDados['request']['query'] ? ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetDados['response'] :
+	T extends ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetZpl['request']['query'] ? ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetZpl['response'] :
+	never
+);
 
 export class Jamef {
 	private username: string;
@@ -133,39 +141,57 @@ export class Jamef {
 		return response;
 	}
 
-	public async getLabel(
-		path: { chaveNotaFisca𝚕: string },
-		query: ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet['request']['query'],
-	): Promise<
-		ReturnType<
-			typeof services<{
-				url: ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGet['request']['url'];
-				method: 'GET';
-				query: typeof query;
-				headers: { Authorization: Awaited<ReturnType<Jamef['login']>> };
-			}>
-		>
-	> {
+	public async getLabel<
+		T extends
+			| ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetDados['request']['query']
+			| ApiJamefComBrOperacaoV1EtiquetaChaveNotaFiscalGetZpl['request']['query'],
+	>(
+		path: { chaveNotaFiscal: string },
+		query: T,
+	): Promise<GetLabelResponses<T>> {
 		const options = {
 			method: 'GET',
-			query,
 			headers: { Authorization: await this.login() },
 		} as const;
 
-		let response;
+		if (query.tipoRetorno === 'DADOS') {
+			let response;
 
-		if (this.isProduction) {
-			response = await services({
-				url: `https://api.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFisca𝚕}`,
-				...options,
-			});
-		} else {
-			response = await services({
-				url: `https://api-qa.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFisca𝚕}`,
-				...options,
-			});
+			if (this.isProduction) {
+				response = (await services({
+					...options,
+					query,
+					url: `https://api.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFiscal}`,
+				})) as GetLabelResponses<T>;
+			} else {
+				response = (await services({
+					...options,
+					query,
+					url: `https://api-qa.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFiscal}`,
+				})) as GetLabelResponses<T>;
+			}
+
+			return response;
+		} else if (query.tipoRetorno === 'ZPL') {
+			let response;
+
+			if (this.isProduction) {
+				response = (await services({
+					...options,
+					query,
+					url: `https://api.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFiscal}`,
+				})) as GetLabelResponses<T>;
+			} else {
+				response = (await services({
+					...options,
+					query,
+					url: `https://api-qa.jamef.com.br/operacao/v1/etiqueta/${path.chaveNotaFiscal}`,
+				})) as GetLabelResponses<T>;
+			}
+
+			return response;
 		}
 
-		return response;
+		throw new Error('Not implemented');
 	}
 }
