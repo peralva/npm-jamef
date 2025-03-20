@@ -4,6 +4,7 @@ import dts from 'rollup-plugin-dts';
 export default [
 	{
 		input: 'src/index.ts',
+		external: ['@peralva/services'],
 		output: [
 			{
 				file: 'lib/index.js',
